@@ -16,14 +16,27 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 function Navbar() {
-  const user: any = null
+  const user: any = {
+    name: "John Doe",
+    email: "john@example.com",
+    isAdmin: true,
+  };
   const { cartCount, setCartOpen } = {
-    cartCount: 5,
+    cartCount: 10,
     setCartOpen: (_data: any) => {},
   };
   const [searchQuery, setSearchQuery] = useState("");
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const navigate = useNavigate();
+  // handling search
+  const handleSearch=(e:React.handleSubmit)=>{
+    e.preventDefault()
+    if(searchQuery.trim()){
+      navigate(`/search?q/=${encodeURIComponent(searchQuery.trim())}`)
+      setSearchQuery("")
+    }
+
+  }
   return (
     <nav className="bg-white sticky top-0 z-50 border-b border-app-border ">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between h-16 gap-4">
@@ -49,7 +62,7 @@ function Navbar() {
             </Link>
           </div>
           {/* search box */}
-          <form className="hidden sm:flex flex-1  max-w-sm text-xs sm:text-xs">
+          <form onClick={handleSearch} className="hidden sm:flex flex-1  max-w-sm text-xs sm:text-xs">
             <div className="relative w-full">
               <SearchCheck className="absolute left-2.5 top-1/2 -translate-y-1/2 size-4 text-zinc-400" />
               <input
@@ -88,7 +101,7 @@ function Navbar() {
                 <div className="flex-center gap-2">
                   <Link
                     to="/login"
-                    className="hidden md:flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-green-950-light rounded-full hover:bg-green-950-light transition-colors"
+                    className="hidden md:flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-green-950 rounded-full hover:bg-green-950-light transition-colors"
                   >
                     <UserIcon size={16} /> Sign In
                   </Link>
