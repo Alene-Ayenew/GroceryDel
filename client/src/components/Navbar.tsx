@@ -29,13 +29,16 @@ function Navbar() {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const navigate = useNavigate();
   // handling search
-  const handleSearch=(e:React.handleSubmit)=>{
-    e.preventDefault()
-    if(searchQuery.trim()){
-      navigate(`/search?q/=${encodeURIComponent(searchQuery.trim())}`)
-      setSearchQuery("")
+  const handleSearch = (e: React.handleSubmit) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/search?q/=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchQuery("");
     }
-
+  };
+  const handleLogOut=()=>{
+    setUserMenuOpen(false)
+    navigate("/")
   }
   return (
     <nav className="bg-white sticky top-0 z-50 border-b border-app-border ">
@@ -62,7 +65,10 @@ function Navbar() {
             </Link>
           </div>
           {/* search box */}
-          <form onClick={handleSearch} className="hidden sm:flex flex-1  max-w-sm text-xs sm:text-xs">
+          <form
+            onClick={handleSearch}
+            className="hidden sm:flex flex-1  max-w-sm text-xs sm:text-xs"
+          >
             <div className="relative w-full">
               <SearchCheck className="absolute left-2.5 top-1/2 -translate-y-1/2 size-4 text-zinc-400" />
               <input
@@ -91,7 +97,10 @@ function Navbar() {
             {/* user */}
             <div className="relative">
               {user ? (
-                <button onClick={()=>setUserMenuOpen(!userMenuOpen)} className="flex items-center gap-2 p-2" >
+                <button
+                  onClick={() => setUserMenuOpen(!userMenuOpen)}
+                  className="flex items-center gap-2 p-2"
+                >
                   <div className="size-7 rounded-full bg-green-950 text-white flex-center">
                     {user.name.charAt(0).toUpperCase()}
                   </div>
@@ -168,9 +177,8 @@ function Navbar() {
                       )}
                       {user && (
                         <div className="border-t border-app-border pt-1">
-                          <button className="flex items-center gap-3 px-4 py-2.5 text-sm text-app-error hover:bg-red-50 w-full transition-colors">
-                            <LogOutIcon size={16}/> Log Out
-
+                          <button onClick={handleLogOut} className="flex items-center gap-3 px-4 py-2.5 text-sm text-app-error hover:bg-red-50 w-full transition-colors">
+                            <LogOutIcon size={16} /> Log Out
                           </button>
                         </div>
                       )}
