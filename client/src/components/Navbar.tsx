@@ -38,7 +38,7 @@ function Navbar() {
   };
   const handleLogOut=()=>{
     setUserMenuOpen(false)
-    navigate("/")
+    navigate("/");
   }
   return (
     <nav className="bg-white sticky top-0 z-50 border-b border-app-border ">

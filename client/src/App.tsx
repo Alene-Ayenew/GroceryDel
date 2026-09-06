@@ -2,7 +2,7 @@ import { Toaster } from "react-hot-toast";
 import { Route, Routes } from "react-router-dom";
 import Login from "./pages/Login";
 import AppLayout from "./pages/AppLayout";
-import { Home } from "lucide-react";
+import Home from "./pages/Home";
 import Products from "./pages/Products";
 import ProductPage from "./pages/ProductPage";
 import SearchResults from "./pages/SearchResults";
@@ -27,7 +27,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         {/* main pages with navbar and footer */}
         <Route path="/" element={<AppLayout />}>
-          <Route index element={<Home />} />
+          <Route index element={<Home/>} />
           <Route path="products" element={<Products />} />
           <Route path="products/:id" element={<ProductPage />} />
           <Route path="search" element={<SearchResults />} />
