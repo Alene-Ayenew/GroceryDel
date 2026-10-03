@@ -42,11 +42,19 @@ function Footer() {
                 {section.links.map((link, i) => (
                   <li key={i}>
                     {link.to ? (
-                      <Link to={link.to} className="text-sm text-white/70 hover:text-white">{
-                        link.label
-                      }</Link>
-                    ):(
-                      <a href={link.href} className="text-sm text-white/70 hover:text-white ">{link.label}</a>
+                      <Link
+                        to={link.to}
+                        className="text-sm text-white/70 hover:text-white"
+                      >
+                        {link.label}
+                      </Link>
+                    ) : (
+                      <a
+                        href={link.href}
+                        className="text-sm text-white/70 hover:text-white "
+                      >
+                        {link.label}
+                      </a>
                     )}
                   </li>
                 ))}
@@ -55,21 +63,38 @@ function Footer() {
           ))}
           {/* contact */}
           <div>
-            <h3 className="text-sm font-semibold uppercase mb-4 ">Contact Us </h3>
+            <h3 className="text-sm font-semibold uppercase mb-4 ">
+              Contact Us{" "}
+            </h3>
             <ul className="space-y-3">
-              {footerData.contact.map((item,i)=>{
-                const Icon=item.icon;
-                return(
+              {footerData.contact.map((item, i) => {
+                const Icon = item.icon;
+                return (
                   <li key={i} className="flex gap-3 text-sm text-white/70">
-                    <Icon className="size-4 text-white"/> {item.text}
+                    <Icon className="size-4 text-white" /> {item.text}
                   </li>
-                )
+                );
               })}
             </ul>
           </div>
         </div>
         {/* bottom */}
-        <div></div>
+        <div className="boarder-t boarder-white/10 mt-10 pt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+          <p className="text-xs text-white/50 ">
+            {footerData.bottom.copyright}
+          </p>
+          <div className="flex gap-4">
+            {footerData.bottom.links.map((link, i) => (
+              <a
+                key={i}
+                href={link.href}
+                className="text-xs text-white/50 hover:text-white/70"
+              >
+                {link.label}
+              </a>
+            ))}
+          </div>
+        </div>
       </div>
     </footer>
   );
