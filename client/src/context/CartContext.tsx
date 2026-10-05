@@ -28,21 +28,31 @@ export function CartProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     localStorage.setItem("app_cart", JSON.stringify(items));
   }, [items]);
-  const addToCart=(product:Product,quantity=1)=>{
-    setItems((prev)=>{
-      const existing=prev.find((item)=>item.product._id===product._id)
+  const addToCart = (product: Product, quantity = 1) => {
+    setItems((prev) => {
+      const existing = prev.find((item) => item.product._id === product._id);
       if (existing) {
-        return prev.map((item)=>(item.product._id===product._id ? {...item,quantity:item.quantity+ quantity}:item))
-        
+        return prev.map((item) =>
+          item.product._id === product._id
+            ? { ...item, quantity: item.quantity + quantity }
+            : item,
+        );
       }
-      return [...prev,{product,quantity}]
-    })
-    setIsCartOpen(true)
-  }
-const removeFromCart=(productId:string)=>{
-  setItems((prev)=>prev.filter((item)=>item.product._id !===productId))
-}
+      return [...prev, { product, quantity }];
+    });
+    setIsCartOpen(true);
+  };
+  const removeFromCart = (productId: string) => {
+    setItems((prev) => prev.filter((item) => item.product._id! === productId));
+  };
+  const updateQuantity=(productId:string,quantity:number)=>{
+    if(quantity <=0){
+      removeFromCart(productId);
+      return ;
 
+    }
+    setItems((prev)=>prev.map((item)=>(item.product._id=== productId ? {...item, quantity}:item)))
+  }
 
   return <CartContext.Provider value={{}}>{children}</CartContext.Provider>;
 }
