@@ -39,6 +39,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
     })
     setIsCartOpen(true)
   }
+const removeFromCart=(productId:string)=>{
+  setItems((prev)=>prev.filter((item)=>item.product._id !===productId))
+}
+
+
   return <CartContext.Provider value={{}}>{children}</CartContext.Provider>;
 }
 export function useCart() {
