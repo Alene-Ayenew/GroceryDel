@@ -61,9 +61,28 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setIsCartOpen(false);
   };
   const cartCount = items.reduce((sum, item) => sum + item.quantity, 0);
-  const cartTotal=items.reduce((sum,item)=>sum + item.product.price*item.quantity,0)
+  const cartTotal = items.reduce(
+    (sum, item) => sum + item.product.price * item.quantity,
+    0,
+  );
 
-  return <CartContext.Provider value={{}}>{children}</CartContext.Provider>;
+  return (
+    <CartContext.Provider
+      value={{
+        items,
+        addToCart,
+        removeFromCart,
+        updateQuantity,
+        clearCart,
+        cartCount,
+        cartTotal,
+        isCartOpen,
+        setIsCartOpen,
+      }}
+    >
+      {children}
+    </CartContext.Provider>
+  );
 }
 export function useCart() {
   const context = useContext(CartContext);
