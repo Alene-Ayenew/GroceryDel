@@ -18,11 +18,17 @@ function Products() {
   const page = Number(searchParams.get("page") || 1);
   const minPrice = searchParams.get("minPrice") || "";
   const maxPrice = searchParams.get("maxPrice") || "";
-  const fetchProducts = async () => {
-    setLoading(true);
-    setProducts(dummyProducts.filter((p) => p.category === category || ""));
-    setLoading(false);
-  };
+ const fetchProducts = async () => {
+  setLoading(true);
+
+  setProducts(
+    category
+      ? dummyProducts.filter((p) => p.category === category)
+      : dummyProducts
+  );
+
+  setLoading(false);
+};
   const updateFilter = (key: string, value: string) => {
     const newParams = new URLSearchParams(searchParams);
     if (value) {
