@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import type { Product } from "../types";
 import { categoriesData, dummyProducts } from "../assets/assets";
-import { Home } from "lucide-react";
+import { Home, SlidersHorizontal } from "lucide-react";
 
 function Products() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -66,6 +66,14 @@ function Products() {
               <div>
                 <h1 className="text-2xl font-semibold text-app-green">{activeCategory ? activeCategory.name: "All Products"}</h1>
                 <p className="text-sm text-app-text-light mt-0.5">{products.length} products found</p>
+              </div>
+              <div className="flex flex-col lg:items-center gap-3 ">
+                {/* mobile toggle */}
+                <button onClick={()=>setMobileFilterOption(true)} className="lg:hidden flex items-center gap-2 px-3 py-2 text-sm bg-white rounded-xl border border-app-border hover:bg-app-cream transition-colors ">
+                  <SlidersHorizontal className="size-4"/> Filters 
+                </button>
+                {/* sort */}
+                
               </div>
             </div>
           </main>
