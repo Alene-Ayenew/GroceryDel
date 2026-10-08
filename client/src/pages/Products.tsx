@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import type { Product } from "../types";
 import { categoriesData, dummyProducts } from "../assets/assets";
-import { ChevronDown, Home, SlidersHorizontal } from "lucide-react";
+import { ChevronDown, Home, SlidersHorizontal, XIcon } from "lucide-react";
 import ProductCard from "../components/ProductCard";
 import Loading from "../components/Loading";
 import FilterPanel from "../components/FilterPanel";
@@ -163,6 +163,38 @@ function Products() {
           </main>
         </div>
       </div>
+      {/* mobile filter modal */}
+      {mobileFilterOption && (
+        <>
+          <div
+            className="fixed inset-0 bg-black/40 z-50"
+            onClick={() => setMobileFilterOption(false)}
+          />
+          <div className="fixed bottom-0 left-0 right-0 bg-white z-50 rounded-tl-2xl max-h-[80vh] overflow-y-auto animate-slide-in-up">
+            <div className="flex items-center justify-between p-4 border-b-app-border border-app-border">
+              <h3 className="text-lg font-semibold text-app-green">Filters</h3>
+              <button
+                onClick={() => setMobileFilterOption(false)}
+                className="p-2 hover:bg-app-cream rounded-lg "
+              >
+                <XIcon className="size-5 " />
+              </button>
+            </div>
+            <div className="p-4">
+              <FilterPanel
+                categories={categoriesData}
+                category={category}
+                organic={organic}
+                minPrice={minPrice}
+                maxPrice={maxPrice}
+                updateFilter={updateFilter}
+                clearFilter={clearFilter}
+                hasFilter={hasFilter}
+              />
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }
