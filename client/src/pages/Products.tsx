@@ -18,17 +18,17 @@ function Products() {
   const page = Number(searchParams.get("page") || 1);
   const minPrice = searchParams.get("minPrice") || "";
   const maxPrice = searchParams.get("maxPrice") || "";
- const fetchProducts = async () => {
-  setLoading(true);
+  const fetchProducts = async () => {
+    setLoading(true);
 
-  setProducts(
-    category
-      ? dummyProducts.filter((p) => p.category === category)
-      : dummyProducts
-  );
+    setProducts(
+      category
+        ? dummyProducts.filter((p) => p.category === category)
+        : dummyProducts,
+    );
 
-  setLoading(false);
-};
+    setLoading(false);
+  };
   const updateFilter = (key: string, value: string) => {
     const newParams = new URLSearchParams(searchParams);
     if (value) {
@@ -99,33 +99,51 @@ function Products() {
                     <option value="rating">Top Rated</option>
                     <option value="name">A to Z</option>
                   </select>
-                  <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 text-app-text-light pointer-events-none"/>
+                  <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 text-app-text-light pointer-events-none" />
                 </div>
               </div>
             </div>
 
             {/* product grid */}
-            {
-              loading ?( <p>Loading....</p>) :products.length===0 ?(
-                <div className="text-center py-16">
-                  <p className="text-lg font-semibold text-app-green mb-2 ">No Products Found </p>
-                  <p className="text-sm text-app-text-light mb-4 ">Try adjusting your filters or search terms</p>
-                  <button onClick={clearFilter} className="px-5 py-2 text-sm font-medium bg-app-green text-white rounded-xl hover:bg-app-green-light transition-colors">
-                    Clear Filters 
-                  </button>
-
-                </div>
-              ) :(
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 xl:gap-8 ">
-                  {
-                    products.map((product)=>product.stock >0 && (
+            {loading ? (
+              <p>Loading....</p>
+            ) : products.length === 0 ? (
+              <div className="text-center py-16">
+                <p className="text-lg font-semibold text-app-green mb-2 ">
+                  No Products Found{" "}
+                </p>
+                <p className="text-sm text-app-text-light mb-4 ">
+                  Try adjusting your filters or search terms
+                </p>
+                <button
+                  onClick={clearFilter}
+                  className="px-5 py-2 text-sm font-medium bg-app-green text-white rounded-xl hover:bg-app-green-light transition-colors"
+                >
+                  Clear Filters
+                </button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 xl:gap-8 ">
+                {products.map(
+                  (product) =>
+                    product.stock > 0 && (
                       <ProductCard key={product._id} product={product} />
-                    ))
-                  }
-
-                </div>
-              )
-            }
+                    ),
+                )}
+              </div>
+            )}
+            {/* pagination */}
+            {totalPages > 1 && (
+              <div className="flex-center gap-2 mt-16 ">
+                {Array.from({ length: totalPages }).map((_, i) => (
+                  <button key={i} onClick={()=>{updateFilter("page",String(i + 1 )); scrollTo(0,0)}}
+                    className={`size-9 rounded-lg text-sm font-medium transition-colors ${page === i + 1 ? "bg-app-green text-white" : "bg-white text-app-text-light hover:bg-app-cream"}`}
+                  >
+                    {i + 1}
+                  </button>
+                ))}
+              </div>
+            )}
           </main>
         </div>
       </div>
