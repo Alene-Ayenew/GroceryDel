@@ -9,6 +9,9 @@ import {
   Home,
   HomeIcon,
   LeafIcon,
+  MinusIcon,
+  PlusIcon,
+  ShoppingCartIcon,
   StarIcon,
 } from "lucide-react";
 
@@ -36,6 +39,19 @@ function ProductPage() {
   const inCart = !!cartItem;
   const displayQuantity = inCart ? cartItem.quantity : localQuantity;
   const categoryLable = product.category.replace(/-/g, " ");
+  const handlMinus = () => {
+    if (inCart) {
+      if (cartItem.quantity > 1)
+        updateQuantity(product._id, cartItem.quantity - 1);
+      else removeFromCart(product._id);
+    } else {
+      setLocalQuantity(Math.max(1, localQuantity - 1));
+    }
+  };
+  const handlPlus = () => {
+    if (inCart) updateQuantity(product._id, cartItem.quantity + 1);
+    else setLocalQuantity(localQuantity + 1);
+  };
 
   return (
     <div className="min-h-screen">
@@ -141,10 +157,45 @@ function ProductPage() {
               {/* stock */}
               <div className="mb-6">
                 {product.stock > 0 ? (
-                  <span className="text-sm text-app-success font-medium"> In Stock({product.stock} available) </span>
+                  <span className="text-sm text-app-success font-medium">
+                    {" "}
+                    In Stock({product.stock} available){" "}
+                  </span>
                 ) : (
-                  <span className="text-sm text-app-error font-medium">Out of Stock</span>
+                  <span className="text-sm text-app-error font-medium">
+                    Out of Stock
+                  </span>
                 )}
+              </div>
+              {/* quantity and Add to cart  */}
+              <div className="flex items-center gap-3">
+                {/* quantity   */}
+                <div className="flex items-center border border-app-border rounded-xl overflow-hidden  ">
+                  <button
+                    onClick={handlMinus}
+                    className="p-3 hover:bg-app-cream transition-colors"
+                  >
+                    <MinusIcon className="w-3 h-4" />
+                  </button>
+                  <span>{displayQuantity}</span>
+                  <button
+                    onClick={handlPlus}
+                    className="p-3 hover:bg-app-cream transition-colors"
+                  >
+                    <PlusIcon className="w-3 h-4" />
+                  </button>
+                </div>
+                {/*  Add to cart  */}
+                <button
+                  onClick={() => {
+                    if (!inCart) addToCart(product, localQuantity);
+                  }}
+                  disabled={product.stock === 0}
+                  className={`flex-1 py-3 font-semibold rounded-xl transition-colors flex-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] ${inCart ? "bg-app-cream text-app-green border border-app-green" : "bg-app-orange text-white hover:bg-app-orange-dark"}`}
+                >
+                  <ShoppingCartIcon className="w-4 h-4" />
+                  {inCart ? "Added To Cart" : "Add To Cart"}
+                </button>
               </div>
             </div>
           </div>
