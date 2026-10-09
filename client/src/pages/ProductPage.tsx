@@ -4,7 +4,7 @@ import { useCart } from "../context/CartContext";
 import type { Product } from "../types";
 import { dummyProducts } from "../assets/assets";
 import Loading from "../components/Loading";
-import { ArrowLeftIcon, Home, HomeIcon } from "lucide-react";
+import { ArrowLeftIcon, Home, HomeIcon, LeafIcon, StarIcon } from "lucide-react";
 
 function ProductPage() {
   const currency = import.meta.env.VITE_CURRENCY_SYMBOL || "$";
@@ -47,16 +47,69 @@ function ProductPage() {
             Products
           </Link>
           <span>/</span>
-          <Link to={`/products?category=${product.category}`} className="hover:text-app-green transition-colors capitalize">
+          <Link
+            to={`/products?category=${product.category}`}
+            className="hover:text-app-green transition-colors capitalize"
+          >
             {categoryLable}
           </Link>
           <span>/</span>
-          <span className="text-app-green font-medium truncate max-w-[200px]">{product.name}</span>
+          <span className="text-app-green font-medium truncate max-w-[200px]">
+            {product.name}
+          </span>
         </nav>
         {/* back button */}
-        <button onClick={()=> navigate(-1)} className="mb-6 flex items-center gap-1.5 text-sm text-app-text-light hover:text-app-green transition-colors">
-          <ArrowLeftIcon className="size-4"/> Back
+        <button
+          onClick={() => navigate(-1)}
+          className="mb-6 flex items-center gap-1.5 text-sm text-app-text-light hover:text-app-green transition-colors"
+        >
+          <ArrowLeftIcon className="size-4" /> Back
         </button>
+        {/* Product Detail Section */}
+        <div className="bg-white/50 rounded-2xl overflow-hidden">
+          <div className="grid md:grid-cols-2 gap-0">
+            {/* left side =>Image */}
+            <div className="relative flex-center p-8 md:p-12 min-h-[320px] md:min-h-[480px]">
+              <img
+                src={product.image}
+                alt={product.name}
+                className="max-h-[360px] w-auto object-contain "
+              />
+              {/* badge  */}
+              <div className="absolute top-5 left-5 flex flex-wrap gap-1.5">
+                {product.isOrganic && (
+                  <span className="flex items-center gap-1 px-2.5 py-1 text-xs font-semibold bg-app-green text-white rounded-full ">
+                    <LeafIcon className="w-3 h-3" />
+                    Organic
+                  </span>
+                )}{" "}
+                {product.discount > 0 && (
+                  <span className="px-2.5 py-1 text-xs font-semibold bg-app-orange text-white rounded-full ">
+                    {product.discount}% OFF
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* right side =>Detail */}
+            <div className="p-6 md:p-10 flex flex-col justify-center">
+              <span className="text-xs font-medium text-app-text-light tracking-wider mb-2 capitalize">{categoryLable}</span>
+              <h1 className="text-2xl md:text-3xl font-semibold text-app-green mb-3">{product.name}</h1>
+              {/* rating */}
+              {product.rating >0 &&(
+                <div className="flex items-center gap-2 mb-5">
+                  <div className="flex items-center gap-0.5 ">{[1,2,3,4,5].map((star)=>(
+                    <StarIcon key={star} className={`w-4 h-4 ${star <= Math.round(product.rating) ? "text-app-warning fill-app-warning":"text-app-border"}`}/>
+                  ))} </div>
+                  <span className="text-sm font-medium ">{product.rating}</span>
+                  <span className="text-sm text-app-text-light">({product.reviewCount} reviews )</span>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+        {/* Customer  Review*/}
+        {/* Related Products */}
       </div>
     </div>
   );
