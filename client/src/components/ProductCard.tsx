@@ -14,7 +14,7 @@ function ProductCard({ product }: Props) {
   return (
     <div
       className="bg-white rounded-2xl overflow-hidden shadow hover:shadow-md transition-all duration-300 animate-fade-in cursor-pointer"
-      onClick={() => navigate("/product/${product._id}")}
+      onClick={() => navigate(`/products/${product._id}`)}
     >
       {/* image  */}
       <div className="relative aspect-square overflow-hidden">
