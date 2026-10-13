@@ -6,6 +6,7 @@ import Loading from "../components/Loading";
 import { ArrowLeftIcon } from "lucide-react";
 import OrderOTP from "../components/OrderTracking/OrderOTP";
 import LiveMap from "../components/OrderTracking/LiveMap";
+import OrderTimeLine from "../components/OrderTracking/OrderTimeLine";
 
 function OrderTracking() {
   const { id } = useParams();
@@ -57,15 +58,14 @@ function OrderTracking() {
           {/* left side - TimeLine + Map area */}
           <div className="lg:col-span-2 space-y-6">
             {/* OTP Card  */}
-            <OrderOTP order={order}/>
+            <OrderOTP order={order} />
             {/* Live Tracking Map */}
-            <LiveMap order={order} liveLocation={liveLocation}/>
-
+            <LiveMap order={order} liveLocation={liveLocation} />
+            {/* Progress timeline  */}
+            <OrderTimeLine order={order}/>
           </div>
           {/* Right side - Order Detail */}
-          <div>
-
-          </div>
+          <div></div>
         </div>
       </div>
     </div>
