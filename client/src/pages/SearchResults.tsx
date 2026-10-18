@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import type { Product } from '../types'
-import { useSearchParams } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { dummyProducts } from '../assets/assets'
+import { Home } from 'lucide-react'
 
 function SearchResults() {
   const[products,setProducts]=useState<Product[]>([])
@@ -16,7 +17,21 @@ function SearchResults() {
 
   },[query])
   return (
-    <div>SearchResults</div>
+    <div className='min-h-screen bg-app-cream'>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {/* breadcrumb */}
+          <nav className="flex items-center gap-2 text-sm text-app-text-light mb-6">
+          <Link to="/" className="hover:text-app-green transition-colors">
+            <Home className="size-4" />
+          </Link>
+          <span>/</span>
+          <span className="text-app-green font-medium">
+            Search Results 
+          </span>
+        </nav>
+      </div>
+
+    </div>
   )
 }
 
