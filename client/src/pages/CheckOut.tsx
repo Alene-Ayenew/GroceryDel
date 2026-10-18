@@ -187,16 +187,13 @@ function CheckOut() {
                   {tax.toFixed(2)}
                 </span>
               </div>
-<div className="flex justify-between pt-3 border-t border-app-border text-base font-semibold">
-                <span>
-                  Total
-                </span>
+              <div className="flex justify-between pt-3 border-t border-app-border text-base font-semibold">
+                <span>Total</span>
                 <span className="text-app-green">
                   {currency}
                   {total.toFixed(2)}
                 </span>
               </div>
-
             </div>
           </div>
         </div>
