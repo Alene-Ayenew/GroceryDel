@@ -12,6 +12,9 @@ import {
   Key,
   MapPinIcon,
 } from "lucide-react";
+import CheckoutAddress from "../components/Checkout/CheckoutAddress";
+import CheckoutPayment from "../components/Checkout/CheckoutPayment";
+import CheckoutReview from "../components/Checkout/CheckoutReview";
 
 function CheckOut() {
   const navigate = useNavigate();
@@ -112,13 +115,23 @@ function CheckOut() {
               >
                 <s.icon className="size-4" />
                 {s.label}
+                {i < steps.length - 1 && (
+                  <ChevronsLeftIcon className="size-4 text-app-text-light" />
+                )}
               </button>
-
-              {i < steps.length - 1 && (
-                <ChevronsLeftIcon className="size-4 text-app-text-light" />
-              )}
             </div>
           ))}
+        </div>
+        <div className="grid md:grid-cols-3 gap-6">
+          {/* Main form */}
+          <div className="md:col-span-2">
+            {step ==="address" && <CheckoutAddress address={address} setAddress={setAddress} setStep={setStep} user={user}/>}
+
+            {step ==="payment" && <CheckoutPayment paymentMethod={paymentMethod} setPaymentMethod={setPaymentMethod} setStep={setStep} />}
+
+            {step ==="review" && <CheckoutReview address={address} items={items} handlePlaceOrder={handlePlaceOrder} loading={loading} total={total}/>}
+          </div>
+          {/* order summery side bar */}
         </div>
       </div>
     </div>
