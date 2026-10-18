@@ -30,7 +30,7 @@ function Navbar() {
   const handleSearch = (e: React.handleSubmit) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      navigate(`/search?q/=${encodeURIComponent(searchQuery.trim())}`);
+      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`)
       setSearchQuery("");
     }
   };
@@ -63,8 +63,7 @@ function Navbar() {
             </Link>
           </div>
           {/* search box */}
-          <form
-            onClick={handleSearch}
+          <form onSubmit={handleSearch}
             className="hidden sm:flex flex-1  max-w-sm text-xs sm:text-xs"
           >
             <div className="relative w-full">
