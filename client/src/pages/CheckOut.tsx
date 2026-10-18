@@ -125,13 +125,80 @@ function CheckOut() {
         <div className="grid md:grid-cols-3 gap-6">
           {/* Main form */}
           <div className="md:col-span-2">
-            {step ==="address" && <CheckoutAddress address={address} setAddress={setAddress} setStep={setStep} user={user}/>}
+            {step === "address" && (
+              <CheckoutAddress
+                address={address}
+                setAddress={setAddress}
+                setStep={setStep}
+                user={user}
+              />
+            )}
 
-            {step ==="payment" && <CheckoutPayment paymentMethod={paymentMethod} setPaymentMethod={setPaymentMethod} setStep={setStep} />}
+            {step === "payment" && (
+              <CheckoutPayment
+                paymentMethod={paymentMethod}
+                setPaymentMethod={setPaymentMethod}
+                setStep={setStep}
+              />
+            )}
 
-            {step ==="review" && <CheckoutReview address={address} items={items} handlePlaceOrder={handlePlaceOrder} loading={loading} total={total}/>}
+            {step === "review" && (
+              <CheckoutReview
+                address={address}
+                items={items}
+                handlePlaceOrder={handlePlaceOrder}
+                loading={loading}
+                total={total}
+              />
+            )}
           </div>
           {/* order summery side bar */}
+          <div className="bg-white rounded-2xl p-5 h-fit sticky top-24">
+            <h3 className="text-sm font-semibold text-app-green mb-4 ">
+              Order summery{" "}
+            </h3>
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span className="text-app-text-light">
+                  Subtotal({items.length} items)
+                </span>
+                <span>
+                  {currency}
+                  {cartTotal.toFixed(2)}
+                </span>
+              </div>
+
+              <div className="flex justify-between">
+                <span className="text-app-text-light">
+                  Delivery ({items.length} items)
+                </span>
+                <span>
+                  {deliveryFee === 0 ? (
+                    <span className="text-app-success">Free </span>
+                  ) : (
+                    `${currency}${deliveryFee.toFixed(2)}`
+                  )}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-app-text-light">Tax</span>
+                <span>
+                  {currency}
+                  {tax.toFixed(2)}
+                </span>
+              </div>
+<div className="flex justify-between pt-3 border-t border-app-border text-base font-semibold">
+                <span>
+                  Total
+                </span>
+                <span className="text-app-green">
+                  {currency}
+                  {total.toFixed(2)}
+                </span>
+              </div>
+
+            </div>
+          </div>
         </div>
       </div>
     </div>
