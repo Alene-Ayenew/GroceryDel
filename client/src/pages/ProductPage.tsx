@@ -7,7 +7,7 @@ import Loading from "../components/Loading";
 import {
   ArrowLeftIcon,
   ArrowRightIcon,
-  Home,
+  // Home,
   HomeIcon,
   LeafIcon,
   MinusIcon,
