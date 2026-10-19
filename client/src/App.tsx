@@ -18,6 +18,9 @@ import AdminProducts from "./pages/admin/AdminProducts";
 import AdminProductForm from "./pages/admin/AdminProductForm";
 import AdminOrders from "./pages/admin/AdminOrders";
 import AdminDeliveryPartners from "./pages/admin/AdminDeliveryPartners";
+import DeliveryLogin from "./pages/delivery/DeliveryLogin";
+import DeliveryLayout from "./pages/delivery/DeliveryLayout";
+import DeliveryDashboard from "./pages/delivery/DeliveryDashboard";
 function App() {
   return (
     <>
@@ -33,28 +36,32 @@ function App() {
         <Route path="/login" element={<Login />} />
         {/* main pages with navbar and footer */}
         <Route path="/" element={<AppLayout />}>
-          <Route index element={<Home/>} />
+          <Route index element={<Home />} />
           <Route path="products" element={<Products />} />
           <Route path="products/:id" element={<ProductPage />} />
           <Route path="search" element={<SearchResults />} />
           <Route path="deals" element={<FlashDealsPage />} />
           {/* protected routes */}
-          <Route element={<ProtectedRoute/>}>
-            <Route path="checkout" element={<CheckOut/>}/>
-            <Route path="orders" element={<MyOrders/>}/>
-            <Route path="orders/:id" element={<OrderTracking/>}/>
-            <Route path="addresses" element={<Address/>}/>
-          </Route>  
+          <Route element={<ProtectedRoute />}>
+            <Route path="checkout" element={<CheckOut />} />
+            <Route path="orders" element={<MyOrders />} />
+            <Route path="orders/:id" element={<OrderTracking />} />
+            <Route path="addresses" element={<Address />} />
+          </Route>
         </Route>
         {/* admin page */}
-        <Route path="/admin" element={<AdminLayout/>}>
-        <Route index element={<AdminDashboard/>}/>
-        <Route path="/products" element={<AdminProducts/>}/>
-        <Route path="/products/new" element={<AdminProductForm/>}/>
-        <Route path="/products/:id/edit" element={<AdminProductForm/>}/>
-        <Route path="orders" element={<AdminOrders/>}/>
-        <Route path="delivery-partner" element={<AdminDeliveryPartners/>}/>
-
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<AdminDashboard />} />
+          <Route path="products" element={<AdminProducts />} />
+          <Route path="products/new" element={<AdminProductForm />} />
+          <Route path="products/:id/edit" element={<AdminProductForm />} />
+          <Route path="orders" element={<AdminOrders />} />
+          <Route path="delivery-partner" element={<AdminDeliveryPartners />} />
+        </Route>
+        {/* Delivery Partner pages */}
+        <Route path="/delivery/login" element={<DeliveryLogin />} />
+        <Route path="/delivery" element={<DeliveryLayout />}>
+          <Route index element={<DeliveryDashboard />} />
         </Route>
       </Routes>
     </>
