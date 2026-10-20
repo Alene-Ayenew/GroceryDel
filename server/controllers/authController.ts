@@ -6,6 +6,12 @@ import  jwt from "jsonwebtoken";
 const generateToken=(id:string){
     return jwt.sign({id},process.env.JWT_SECRET as string,{expiresIn:"30d"})
 }
+// check if the user is admin
+const getAdminStatus=(email:string | null |undefined) :boolean=>{
+    if(!email) return false;
+    const adminEmails=process.env.ADMIN_EMAILS ? process.env.ADMIN_EMAILS.split(",").map((e)=>e.trim().toLowerCase()):[];
+    return adminEmails.includes(email.toLowerCase())
+}
 // Register
 // POST /api/auth/register
 export const register = async (req: Request, res: Response) => {
@@ -25,4 +31,9 @@ export const register = async (req: Request, res: Response) => {
   const user=await prisma.user.create({
     data:{name,email:email.toLowerCase(),password:hashedPassword}
   })
+  const token=generateToken(user.id)
+  const userData:any={...user}
+  delete userData.password;
+  userData.isAdmin=getAdminStatus(userData.email)
+  res.status(201).json({user:userData,token})
 };
