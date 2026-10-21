@@ -58,3 +58,16 @@ export const getProduct = async (req: Request, res: Response) => {
       : 0;
   res.json({ ...product, discount });
 };
+
+// POST /api/products =>creating products
+export const createProduct=async (req:Request,res:Response) => {
+    const product=await prisma.product.create({data:req.body})
+    res.status(201).json({product})
+    
+}
+// PUT /api/products/:idb=>product update 
+export const updateProduct=async (req:Request,res:Response) => {
+    const product=await prisma.product.update({where:{id:req.params.id as string},data:req.body})
+    res.status(201).json({product});
+    
+}
