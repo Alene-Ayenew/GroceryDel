@@ -91,3 +91,16 @@ export const getUserOrders=async (req:Request,res:Response) => {
   res.json({orders})
   
 }
+// GET single order
+// GET /api/orders/:id
+export const getOrder=async (req:Request,res:Response) => {
+  const order=await prisma.order.findFirst({
+    where:{id:req.params.id as string,userId:req.user!.id},
+    include:{deliveryPartner:{select:{name:true,phone:true,avatar:true,vehicleType:true}}}
+  })
+  if(!order){
+    return res.status(400).json({message:"Order not found"})
+  }
+  res.json({order})
+  
+}
