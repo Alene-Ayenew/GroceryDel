@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { prisma } from "../config/prisma.js";
+import { timeStamp } from "node:console";
 // create order
 // POST /api/orders
 export const createOrder = async (req: Request, res: Response) => {
@@ -103,4 +104,18 @@ export const getOrder=async (req:Request,res:Response) => {
   }
   res.json({order})
   
+}
+// Update order status(admin)
+// PUT /api/orders/:id/status
+export const updateOrderStatus=async (req:Request,res:Response) => {
+  const {status,note}=req.body;
+  const order=await prisma.order.findUnique({where:{id:req.params.id as string}})
+  if(!order){
+    return res.status(400).json({message:"order not found"})
+  }
+  const history =(Array.isArray(order.statusHistory)?order.statusHistory:[]) as any[];
+  history.push({status,note:note || `order${status.toLowerCase()}`,timeStamp: new Date()})
+  const updatedOrder=await prisma.order.update({where:{id:req.params.id as string},
+  data:{status,statusHistory:history}})
+  res.json({order:updatedOrder})
 }
