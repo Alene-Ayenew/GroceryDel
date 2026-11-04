@@ -3,7 +3,7 @@ import { prisma } from "../config/prisma.js";
 import bcrypt from "bcrypt";
 import  jwt from "jsonwebtoken";
 // Generate JWT tokens
-const generateToken=(id:string){
+const generateToken=(id:string)=>{
     return jwt.sign({id},process.env.JWT_SECRET as string,{expiresIn:"30d"})
 }
 // check if the user is admin
