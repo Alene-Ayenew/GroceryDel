@@ -1,6 +1,7 @@
 import { cron, Inngest } from "inngest";
 import { prisma } from "../config/prisma.js";
 import sendEmail from "../config/nodemailer.js";
+import { timeStamp } from "node:console";
 
 const LOW_STOCK_THRESHOLD = 10;
 // Create a client to send and receive events
@@ -100,12 +101,12 @@ const sendMonthlyOffers = inngest.createFunction(
     const batchSize = 10;
     for (let i = 0; i < users.length; i += batchSize) {
       const batch = users.slice(i, i + batchSize);
-      await step.run(`send-offers-batch-${i}`,async()=>{
-        for(const u of batch){
+      await step.run(`send-offers-batch-${i}`, async () => {
+        for (const u of batch) {
           await sendEmail({
-            to:u.email,
-            subject:`Fresh Picks For You!`,
-            body:`  <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 520px; margin: auto; border: 1px solid #e5e7eb; border-radius: 16px; overflow: hidden;">
+            to: u.email,
+            subject: `Fresh Picks For You!`,
+            body: `  <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 520px; margin: auto; border: 1px solid #e5e7eb; border-radius: 16px; overflow: hidden;">
                 
                 <div style="background: linear-gradient(135deg, #f97316, #fb923c); padding: 24px 28px;">
                     <h2 style="color: #fff; margin: 0; font-size: 20px;">Fresh Picks Just For You!</h2>
@@ -121,18 +122,18 @@ const sendMonthlyOffers = inngest.createFunction(
 
                     <table width="100%" cellpadding="0" cellspacing="0">
                         ${deals
-                            .reduce((rows: any, _, i: number) => {
-                                if (i % 3 === 0) {
-                                    rows.push(deals.slice(i, i + 3));
-                                }
-                                return rows;
-                            }, [])
-                            .map(
-                                (row: any) => `
+                          .reduce((rows: any, _, i: number) => {
+                            if (i % 3 === 0) {
+                              rows.push(deals.slice(i, i + 3));
+                            }
+                            return rows;
+                          }, [])
+                          .map(
+                            (row: any) => `
                                 <tr>
                                     ${row
-                                        .map(
-                                            (p: any) => `
+                                      .map(
+                                        (p: any) => `
                                             <td style="width: 33%; padding: 8px; vertical-align: top;">
                                                 <div style="border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden; text-align: center;">
                                                     ${p.image ? `<img src="${p.image}" alt="${p.name}" style="width: 100%; height: 100px; object-fit: cover;" />` : ""}
@@ -146,12 +147,12 @@ const sendMonthlyOffers = inngest.createFunction(
                                                         </p>
                                                     </div>
                                                 </div>
-                                            </td>`
-                                        )
-                                        .join("")}
-                                </tr>`
-                            )
-                            .join("")}
+                                            </td>`,
+                                      )
+                                      .join("")}
+                                </tr>`,
+                          )
+                          .join("")}
                     </table>
 
                     <div style="text-align: center; margin-top: 24px;">
@@ -161,13 +162,78 @@ const sendMonthlyOffers = inngest.createFunction(
                         </a>
                     </div>
                 </div>
-            </div> `
-          })
+            </div> `,
+          });
         }
-      })
-      sentCount+=batch.length;
+      });
+      sentCount += batch.length;
     }
-    return {sent:sentCount}
+    return { sent: sentCount };
   },
 );
-export const functions = [CheckLowStock];
+// Auto-assign rider after 5 min
+const autoAssignRider = inngest.createFunction(
+  {
+    id: "auto-assign-rider",
+    name: "Auto Assign Rider",
+    triggers: [{ event: "order/placed" }],
+  },
+  async ({ event, step }) => {
+    const { orderId } = event.data;
+    // wait 5 minutes before attempting assignment
+    await step.sleep("wait-5-min", "5m");
+    const result = await step.run("assign-rider", async () => {
+      const order = await prisma.order.findUnique({ where: { id: orderId } });
+      // skip if order  does not exist ,already assigned or canceled
+      if (!order) return { skipped: true, reason: "order not found" };
+      if (!order.deliveryPartnerId)
+        return { skipped: true, reason: "Already assigned" };
+      if (["Cancelled", "Delivered"].includes(order.status as string))
+        return { skipped: true, reason: `Order is ${order.status}` };
+      // Find an active rider not currently delivering
+      const busyOrders = await prisma.order.findMany({
+        where: {
+          status: { in: ["Assigned", "Packed", "Out for Delivery"] },
+          deliveryPartnerId: { not: null },
+        },
+        select: { deliveryPartnerId: true },
+      });
+      const busyRiderIds = busyOrders.map((o) => o.deliveryPartnerId);
+      const availableRider = await prisma.deliveryPartner.findFirst({
+        where: {
+          isActive: true,
+          id: { notIn: busyRiderIds as string[] },
+        },
+      });
+      if (!availableRider)
+        return { skipped: true, reason: "No riders available" };
+      // generate 6-digit OTP
+      const otp = Math.floor(100000 + Math.random() * 900000).toString();
+      const history = (
+        Array.isArray(order.statusHistory) ? order.statusHistory : []
+      ) as any[];
+      history.push({
+        status: "Assigned",
+        note: `Auto-assigned to${availableRider.name}`,
+        timeStamp: new Date(),
+      });
+      await prisma.order.update({
+        where: { id: orderId },
+        data: {
+          deliveryPartnerId: availableRider.id,
+          deliveryOtp: otp,
+          status: "Assigned",
+          statusHistory: history,
+        },
+      });
+      return {
+        assigned: true,
+        riderId: availableRider.id,
+        riderName: availableRider.name,
+        orderId: orderId,
+      };
+    });
+    return result;
+  },
+);
+export const functions = [CheckLowStock, sendMonthlyOffers,autoAssignRider];
