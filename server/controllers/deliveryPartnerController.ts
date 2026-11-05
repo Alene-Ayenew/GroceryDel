@@ -129,9 +129,22 @@ export const updateDeliveryStatus = async (req: Request, res: Response) => {
     note: `Status updated to ${status}`,
     timeStamp: new Date(),
   });
-  const updatedOrder=await prisma.order.update({
-    where:{id:order!.id},
-    data:{status,statusHistory:history}
-  })
-  res.json({order:updatedOrder})
+  const updatedOrder = await prisma.order.update({
+    where: { id: order!.id },
+    data: { status, statusHistory: history },
+  });
+  res.json({ order: updatedOrder });
+};
+// update live location
+// PUT /api/delivery/my-deliveries/:id/location
+export const updateLocation = async (req: Request, res: Response) => {
+  const { lat, lng } = req.body;
+  const order = await prisma.order.findFirst({
+    where: {
+      id: req.params.id as string,
+      deliveryPartnerId: req.partner!.id,
+      status: { in: ["Assigned", "Packed", "Out of Delivery"] },
+    },
+  });
+  res.json({success:true})
 };
