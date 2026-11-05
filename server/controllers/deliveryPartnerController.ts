@@ -106,9 +106,32 @@ export const cancelDelivery = async (req: Request, res: Response) => {
     note: reason || " ",
     timeStamp: new Date(),
   });
+  const updatedOrder = await prisma.order.update({
+    where: { id: order!.id },
+    data: { status: "Cancelled", statusHistory: history },
+  });
+  res.json({ order: updatedOrder, message: "Delivery Cancelled" });
+};
+// update order status
+// PUT /api/delivery/my-deliveries/:id/status
+export const updateDeliveryStatus = async (req: Request, res: Response) => {
+  const { status } = req.body;
+  const allowedStatuses = ["Packed", "Out of delivery"];
+  if (!allowedStatuses.includes(status)) {
+    return res.status(400).json({ message: "Invalid status updated" });
+  }
+  const order = await prisma.order.findFirst({
+    where: { id: req.params.id as string, deliveryPartnerId: req.partner!.id },
+  });
+  const history = order!.statusHistory as any[];
+  history.push({
+    status,
+    note: `Status updated to ${status}`,
+    timeStamp: new Date(),
+  });
   const updatedOrder=await prisma.order.update({
     where:{id:order!.id},
-    data:{status:"Cancelled",statusHistory:history}
+    data:{status,statusHistory:history}
   })
-  res.json({order:updatedOrder,message:"Delivery Cancelled"})
+  res.json({order:updatedOrder})
 };
