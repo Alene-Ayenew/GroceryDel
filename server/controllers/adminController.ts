@@ -39,3 +39,10 @@ export const getAdminStatus = async (req: Request, res: Response) => {
     recentOrders,
   });
 };
+// get delivery partners list for admin
+export const getDeliveryPartner = async (req: Request, res: Response) => {
+  const partners = await prisma.deliveryPartner.findMany({
+    orderBy: { createdAt: "desc" },
+  });
+  res.json({ partners });
+};
