@@ -1,12 +1,13 @@
 import { Request, Response } from "express";
 import { prisma } from "../config/prisma.js";
-import bcrypt from "bcrypt"
-import  Jwt  from "jsonwebtoken";
+import bcrypt from "bcrypt";
+import Jwt from "jsonwebtoken";
 
-const generateToken=(id:string)=>{
-    return Jwt.sign({id,role:"Delivery"},process.env.JWT_SECRETE as string,{expiresIn:"30d"})
-
-}
+const generateToken = (id: string) => {
+  return Jwt.sign({ id, role: "Delivery" }, process.env.JWT_SECRETE as string, {
+    expiresIn: "30d",
+  });
+};
 // login  Delivery Partner
 // POST /api/delivery/login
 export const LoginPartner = async (req: Request, res: Response) => {
@@ -27,11 +28,28 @@ export const LoginPartner = async (req: Request, res: Response) => {
       .status(403)
       .json({ message: "Your account is has been deactivated" });
   }
-  const isMatch=await bcrypt.compare(password,partner.password)
-  if(!isMatch){
-    return res.status(401).json({message:"Invalid email or password"})
+  const isMatch = await bcrypt.compare(password, partner.password);
+  if (!isMatch) {
+    return res.status(401).json({ message: "Invalid email or password" });
   }
-  const token=generateToken(partner.id)
-  const {password:_,...partnerData}=partner
-  res.json({partner:partnerData,token})
+  const token = generateToken(partner.id);
+  const { password: _, ...partnerData } = partner;
+  res.json({ partner: partnerData, token });
 };
+// Get assigned delivery
+// GET /api/delivery//my-deliveries
+export const getMyDeliveries = async (req: Request, res: Response) => {
+  const { status } = req.query;
+  const where: any = { deliveryPartnerId: req.partner!.id };
+  if (status === "active") {
+    where.status = { in: ["Assigned", "packed", "Out for delivery"] };
+  } else if (status === "completed") {
+    where.status = { in: ["Delivered", "cancelled"] };
+  }
+  const orders = await prisma.order.findMany({
+    where,
+    include: { user: { select: { name: true, email: true, phone: true } } },
+  });
+  res.json({orders})
+};
+// Get single 
