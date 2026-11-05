@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import { prisma } from "../config/prisma.js";
 import bcrypt from "bcrypt";
+import { stat } from "node:fs";
+import { timeStamp } from "node:console";
 // get admin dashboard data
 export const getAdminStatus = async (req: Request, res: Response) => {
   const [
@@ -80,6 +82,39 @@ export const updateDeliveryPartner = async (req: Request, res: Response) => {
     });
     res.json({ partner });
   } catch (error) {
-    res.status(404).json({message:"Partner not found"});
+    res.status(404).json({ message: "Partner not found" });
   }
+};
+// assign delivery partner for order
+export const assignDeliveryPartner = async (req: Request, res: Response) => {
+  const { partnerId } = req.body;
+  const order = await prisma.order.findUnique({
+    where: { id: req.params.id as string },
+  });
+  const partner = await prisma.deliveryPartner.findUnique({
+    where: { id: partnerId },
+  });
+  const otp = String(Math.floor(100000 + Math.random() * 900000));
+  let status = order!.status;
+  const history: any[] = Array.isArray(order!.statusHistory)
+    ? order!.statusHistory
+    : [];
+  if (order!.status === "Placed" || order!.status === "Confirmed") {
+    status = "Assigned";
+    history.push({
+      status: "Assigned",
+      note: `Assigned to ${partner!.name}`,
+      timeStamp: new Date(),
+    });
+  }
+  await prisma.order.update({
+    where: { id: order!.id },
+    data: {
+      deliveryPartnerId: partner!.id,
+      deliveryOtp: otp,
+      status,
+      statusHistory: history,
+    },
+  });
+  res.json({order})
 };
