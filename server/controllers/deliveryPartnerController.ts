@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { prisma } from "../config/prisma.js";
 import bcrypt from "bcrypt";
 import Jwt from "jsonwebtoken";
+import { timeStamp } from "node:console";
 
 const generateToken = (id: string) => {
   return Jwt.sign({ id, role: "Delivery" }, process.env.JWT_SECRETE as string, {
@@ -59,8 +60,33 @@ export const getDeliveryDetail = async (req: Request, res: Response) => {
     where: { id: req.params.id as string, deliveryPartnerId: req.partner!.id },
     include: { user: { select: { name: true, email: true, phone: true } } },
   });
-  if(!order){
-    return res.status(404).json({message:"Delivery not found"});
+  if (!order) {
+    return res.status(404).json({ message: "Delivery not found" });
   }
-  res.json({order})
+  res.json({ order });
+};
+// Complete delivery with OTP
+// PUT /api/delivery/my-deliveries/:id/complete
+export const completeDelivery = async (req: Request, res: Response) => {
+  const { otp } = req.body;
+  const order = await prisma.order.findFirst({
+    where: { id: req.params.id as string, deliveryPartnerId: req.partner!.id },
+  });
+  if (!order || order.status === "cancelled" || order.status === "Delivered") {
+    return res.status(400).json({ message: "Invalid Request" });
+  }
+  if (order.deliveryOtp !== otp) {
+    return res.status(500).json({ message: "Invalid OTP" });
+  }
+  const history = order.statusHistory as any[];
+  history.push({
+    status: "Delivered",
+    note: "Delivered by partner",
+    timeStamp: new Date(),
+  });
+  const updatedOrder = await prisma.order.update({
+    where: { id: order.id },
+    data: { status: "Delivered", statusHistory: history, deliveryOtp: "" },
+  });
+  res.json({ order: updatedOrder, message: "Delivery completed successfully" });
 };
