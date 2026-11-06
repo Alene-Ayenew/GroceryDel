@@ -7,6 +7,8 @@ import {
 } from "react";
 import type { User } from "../types";
 import { useNavigate } from "react-router-dom";
+import api from "../config/api";
+import toast from "react-hot-toast";
 
 interface AuthContextType {
   user: User | null;
@@ -24,14 +26,60 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   useEffect(() => {
-    const savedToken=localStorage.getItem("auth_token")
-    const savedUser=localStorage.getItem("auth_user")
-    if(savedToken && savedUser){
-        setToken(savedToken)
-        setUser(JSON.parse(savedUser))
+    const savedToken = localStorage.getItem("auth_token");
+    const savedUser = localStorage.getItem("auth_user");
+    if (savedToken && savedUser) {
+      setToken(savedToken);
+      setUser(JSON.parse(savedUser));
     }
-    setLoading(false)
+    setLoading(false);
   }, []);
+  const login = async (email: string, password: string) => {
+    try {
+      const { data } = await api.post("/auth/login", { email, password });
+      setUser(data.user);
+      setToken(data.token);
+      localStorage.setItem("auth_token", data.token);
+      localStorage.setItem("auth_user", JSON.stringify(data.user));
+      toast.success("Login Successfully");
+      navigate("/");
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || error?.message);
+    }
+  };
+  //   register
+  const register = async (email: string, name: string, password: string) => {
+    try {
+      const { data } = await api.post("/auth/register", {
+        email,
+        name,
+        password,
+      });
+      setUser(data.user);
+      setToken(data.token);
+      localStorage.setItem("auth_token", data.token);
+      localStorage.setItem("auth_user", JSON.stringify(data.user));
+      toast.success("Register Successfully");
+      navigate("/");
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || error?.message);
+    }
+  };
+  //   logout
+  const logout = () => {
+    setUser(null);
+    setToken(null);
+    localStorage.removeItem("auth_token");
+    localStorage.removeItem("auth_user");
+  };
+  //   update users
+  const updateUser = (userData: Partial<User>) => {
+    if (user) {
+      const updated = { ...user, ...userData };
+      setUser(updated);
+      localStorage.setItem("auth_user", JSON.stringify(updated));
+    }
+  };
 
   return <AuthContext.Provider value={}>{children}</AuthContext.Provider>;
 }
