@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { data, Link, useNavigate, useParams } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import type { Product } from "../types";
-import { dummyProducts } from "../assets/assets";
+
 import Loading from "../components/Loading";
 import {
   ArrowLeftIcon,
@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import DummyReviewsSection from "../assets/DummyReviewsSection";
 import ProductCard from "../components/ProductCard";
+import api from "../config/api";
 
 function ProductPage() {
   const currency = import.meta.env.VITE_CURRENCY_SYMBOL || "$";
@@ -31,10 +32,17 @@ function ProductPage() {
     setLoading(true);
     setLocalQuantity(1);
     window.scrollTo(0, 0);
-    const product = dummyProducts.find((p) => p.id === id);
-    setProduct(product!);
-    setRelatedProducts(dummyProducts.filter((p) => p.id !== id));
-    setLoading(false);
+    api
+      .get(`/products/${id}`)
+      .then(({ data }) => {
+        setProduct(data.product);
+        return api.get(`/products?category=${data.product.category}`);
+      })
+      .then(({ data }) => {
+        setRelatedProducts(data.products.filter((p: Product) => p.id !== id));
+      })
+      .catch(() => navigate("/products"))
+      .finally(() => setLoading(false));
   }, [id, navigate]);
   if (loading) return <Loading />;
   if (!product) return null;
@@ -204,28 +212,31 @@ function ProductPage() {
           </div>
         </div>
         {/* Customer  Review*/}
-        {
-          product.reviewCount >0 && <DummyReviewsSection product={product}/>
-        }
+        {product.reviewCount > 0 && <DummyReviewsSection product={product} />}
         {/* Related Products */}
-        {relatedProducts.length > 0 &&(
+        {relatedProducts.length > 0 && (
           <section className="mt-12 mb-44">
             <div className="flex items-center justify-between mb-6 ">
               <div>
-                <h2 className="text-2xl font-semibold text-app-green">Related Products </h2>
-                <p className="text-sm text-app-text-light mt-1 ">More from {categoryLable}</p>
+                <h2 className="text-2xl font-semibold text-app-green">
+                  Related Products{" "}
+                </h2>
+                <p className="text-sm text-app-text-light mt-1 ">
+                  More from {categoryLable}
+                </p>
               </div>
-              <Link className="text-sm font-semibold text-app-orange hover:text-app-orange-dark flex items-center gap-1 transition-colors" to={`/products?category=${product.category}`}>
-              View All <ArrowRightIcon className="size-4  "/></Link>
-
+              <Link
+                className="text-sm font-semibold text-app-orange hover:text-app-orange-dark flex items-center gap-1 transition-colors"
+                to={`/products?category=${product.category}`}
+              >
+                View All <ArrowRightIcon className="size-4  " />
+              </Link>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 xl:gap-8">
-              {relatedProducts.slice(0,5).map((rp)=>(
-                <ProductCard key={rp.id} product={rp}/>
+              {relatedProducts.slice(0, 5).map((rp) => (
+                <ProductCard key={rp.id} product={rp} />
               ))}
-
             </div>
-
           </section>
         )}
       </div>
