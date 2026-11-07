@@ -17,21 +17,22 @@ function Login() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const { login, register } = UseAuth();
-  const handleSubmit = async (e: React.SubmitEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      if (isLoginState) {
-        await login(email, password);
-      } else {
-        register(name, email, password);
-      }
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || error?.message);
-    } finally{
-      setLoading(false)
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
+  setLoading(true);
+
+  try {
+    if (isLoginState) {
+      await login(email.trim().toLowerCase(), password);
+    } else {
+      await register(name.trim(), email.trim().toLowerCase(), password);
     }
-  };
+  } catch (error: any) {
+    toast.error(error?.response?.data?.message || error?.message);
+  } finally {
+    setLoading(false);
+  }
+};
   return (
     <div className="min-h-screen flex">
       {/* left side */}

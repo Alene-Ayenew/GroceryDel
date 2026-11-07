@@ -48,23 +48,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
   //   register
-  const register = async (email: string, name: string, password: string) => {
-    try {
-      const { data } = await api.post("/auth/register", {
-        email,
-        name,
-        password,
-      });
-      setUser(data.user);
-      setToken(data.token);
-      localStorage.setItem("auth_token", data.token);
-      localStorage.setItem("auth_user", JSON.stringify(data.user));
-      toast.success("Register Successfully");
-      navigate("/");
-    } catch (error: any) {
-      toast.error(error?.response?.data?.message || error?.message);
-    }
-  };
+  const register = async (
+  name: string,
+  email: string,
+  password: string
+) => {
+  try {
+    const { data } = await api.post("/auth/register", {
+      name,
+      email,
+      password,
+    });
+
+    setUser(data.user);
+    setToken(data.token);
+
+    localStorage.setItem("auth_token", data.token);
+    localStorage.setItem("auth_user", JSON.stringify(data.user));
+
+    toast.success("Register Successfully");
+    navigate("/");
+  } catch (error: any) {
+    toast.error(error?.response?.data?.message || error?.message);
+    throw error;
+  }
+};
   //   logout
   const logout = () => {
     setUser(null);

@@ -160,7 +160,7 @@ function Navbar() {
                         <ArrowUpRightIcon size={16} /> Deals
                       </Link>
                       {user?.isAdmin && (
-                        <Link to="/admin/product" className="dropdown-link">
+                        <Link to="/admin/" className="dropdown-link">
                           <ShieldIcon
                             className="text-app-green-dark"
                             size={16}

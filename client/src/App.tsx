@@ -21,6 +21,7 @@ import AdminDeliveryPartners from "./pages/admin/AdminDeliveryPartners";
 import DeliveryLogin from "./pages/delivery/DeliveryLogin";
 import DeliveryLayout from "./pages/delivery/DeliveryLayout";
 import DeliveryDashboard from "./pages/delivery/DeliveryDashboard";
+import AdminProtectedRoute from "./components/AdminProtectedRoute";
 function App() {
   return (
     <>
@@ -50,14 +51,20 @@ function App() {
           </Route>
         </Route>
         {/* admin page */}
-        <Route path="/admin" element={<AdminLayout />}>
-          <Route index element={<AdminDashboard />} />
-          <Route path="products" element={<AdminProducts />} />
-          <Route path="products/new" element={<AdminProductForm />} />
-          <Route path="products/:id/edit" element={<AdminProductForm />} />
-          <Route path="orders" element={<AdminOrders />} />
-          <Route path="delivery-partner" element={<AdminDeliveryPartners />} />
-        </Route>
+        {/* Admin pages */}
+<Route element={<AdminProtectedRoute />}>
+  <Route path="/admin" element={<AdminLayout />}>
+    <Route index element={<AdminDashboard />} />
+    <Route path="products" element={<AdminProducts />} />
+    <Route path="products/new" element={<AdminProductForm />} />
+    <Route path="products/:id/edit" element={<AdminProductForm />} />
+    <Route path="orders" element={<AdminOrders />} />
+    <Route
+      path="delivery-partner"
+      element={<AdminDeliveryPartners />}
+    />
+  </Route>
+</Route>
         {/* Delivery Partner pages */}
         <Route path="/delivery/login" element={<DeliveryLogin />} />
         <Route path="/delivery" element={<DeliveryLayout />}>
