@@ -100,23 +100,44 @@ export const getProducts = async (req: Request, res: Response) => {
 
 
 // GET /api/products.:id   =>individual products
+
+// GET /api/products/:id - Get individual product
 export const getProduct = async (req: Request, res: Response) => {
-  const product = await prisma.product.findUnique({
-    where: { id: req.params.id  as string},
-  });
-  if (!product) {
-    res.status(404).json({ message: "Product not found" });
-    return;
+  try {
+    const product = await prisma.product.findUnique({
+      where: { id: req.params.id as string },
+    });
+
+    if (!product) {
+      return res.status(404).json({
+        message: "Product not found",
+      });
+    }
+
+    const discount =
+      product.originalPrice && product.originalPrice > 0
+        ? Math.round(
+            ((product.originalPrice - product.price) /
+              product.originalPrice) *
+              100
+          )
+        : 0;
+
+    return res.json({
+      product: {
+        ...product,
+        discount,
+      },
+    });
+  } catch (error) {
+    console.error("Get individual product error:", error);
+
+    return res.status(500).json({
+      message: "Failed to fetch product",
+    });
   }
-  const discount =
-    product.originalPrice && product.price
-      ? Math.round(
-          ((product.originalPrice - product.price) / product.originalPrice) *
-            100,
-        )
-      : 0;
-  res.json({ ...product, discount });
 };
+
 
 // POST /api/products =>creating products
 export const createProduct=async (req:Request,res:Response) => {
