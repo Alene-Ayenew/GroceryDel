@@ -13,7 +13,7 @@ function AddressCard({ addr, onEditHandler, setAddreses }: AddresCardProps) {
   };
   return (
     <div
-      key={addr._id}
+      key={addr.id}
       className="max-w-3xl bg-white rounded-2xl p-6 flex items-start justify-between"
     >
       {/* left */}
@@ -38,7 +38,7 @@ function AddressCard({ addr, onEditHandler, setAddreses }: AddresCardProps) {
         <button onClick={()=>onEditHandler(addr)} className="p-2 text-app-text-light hover:text-app-green hover:bg-app-cream rounded-lg transition-colors">
           <PencilIcon className="size-4"/>
         </button>
-        <button onClick={()=>handleDelet(addr._id)} className="p-2 text-app-text-light hover:text-app-error hover:bg-red-50 rounded-lg transition-colors">
+        <button onClick={()=>handleDelet(addr.id)} className="p-2 text-app-text-light hover:text-app-error hover:bg-red-50 rounded-lg transition-colors">
           <Trash2Icon className="size-4"/>
         </button>
       </div>
