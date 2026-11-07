@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import type { Product } from "../types";
-import { dummyProducts } from "../assets/assets";
 import { Zap } from "lucide-react";
 import Loading from "../components/Loading";
 import ProductCard from "../components/ProductCard";
