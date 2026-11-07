@@ -17,29 +17,88 @@ export const getFlashDeals = async (req: Request, res: Response) => {
   res.json({ products: productWithDiscount.slice(0, 8) });
 };
 //  GET /api/products
+
+// GET /api/products
+
+// GET /api/products
 export const getProducts = async (req: Request, res: Response) => {
-  const { category, search, minPrice, maxPrice, sort } = req.query;
-  const where: any = {};
-  if (category && category !== "all") where.category = category as string;
-  if (search) where.name = { contains: search as string, mode: "insensitive" };
-  if (minPrice || maxPrice) {
-    where.price = {};
-    if (minPrice) where.price.gte = Number(minPrice);
-    if (maxPrice) where.price.lte = Number(maxPrice);
+  try {
+    const {
+      category,
+      search,
+      minPrice,
+      maxPrice,
+      sort,
+      limit,
+    } = req.query;
+
+    const where: any = {};
+
+    if (category && category !== "all") {
+      where.category = category as string;
+    }
+
+    if (search) {
+      where.name = {
+        contains: search as string,
+        mode: "insensitive",
+      };
+    }
+
+    if (minPrice || maxPrice) {
+      where.price = {};
+
+      if (minPrice) where.price.gte = Number(minPrice);
+      if (maxPrice) where.price.lte = Number(maxPrice);
+    }
+
+    let orderBy: any = { createdAt: "desc" };
+
+    if (sort === "price-low") {
+      orderBy = { price: "asc" };
+    } else if (sort === "price-high") {
+      orderBy = { price: "desc" };
+    } else if (sort === "rating") {
+      orderBy = { rating: "desc" };
+    } else if (sort === "newest") {
+      orderBy = { createdAt: "desc" };
+    }
+
+    const products = await prisma.product.findMany({
+      where,
+      orderBy,
+      ...(limit && {
+        take: Math.min(Math.max(Number(limit) || 8, 1), 100),
+      }),
+    });
+
+    const productWithDiscount = products.map((p) => {
+      const discount =
+        p.originalPrice && p.originalPrice > 0
+          ? Math.round(
+              ((p.originalPrice - p.price) / p.originalPrice) * 100
+            )
+          : 0;
+
+      return {
+        ...p,
+        discount,
+      };
+    });
+
+    return res.json({
+      products: productWithDiscount,
+    });
+  } catch (error) {
+    console.error("Get products error:", error);
+
+    return res.status(500).json({
+      message: "Failed to fetch products",
+    });
   }
-  const orderBy: any = {};
-  if (sort === "price-low") orderBy.price = "asc";
-  else if (sort === "price-high") orderBy.price = "desc";
-  else orderBy.createdAt = "desc";
-  const products = await prisma.product.findMany({ where, orderBy });
-  const productWithDiscount = products.map((p: any) => {
-    const discount =
-      p.originalPrice && p.price
-        ? Math.round(((p.originalPrice - p.price) / p.originalPrice) * 100)
-        : 0;
-  });
-  res.json({ products: productWithDiscount });
 };
+
+
 // GET /api/products.:id   =>individual products
 export const getProduct = async (req: Request, res: Response) => {
   const product = await prisma.product.findUnique({
