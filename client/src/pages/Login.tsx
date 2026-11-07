@@ -1,17 +1,36 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { heroSectionData } from "../assets/assets";
-import { BikeIcon, Loader2Icon, LockIcon, MailIcon, UserIcon } from "lucide-react";
+import {
+  BikeIcon,
+  Loader2Icon,
+  LockIcon,
+  MailIcon,
+  UserIcon,
+} from "lucide-react";
+import { UseAuth } from "../context/authContext";
+import toast from "react-hot-toast";
 function Login() {
   const [isLoginState, setIsLoginState] = useState(true);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const { login, register } = UseAuth();
   const handleSubmit = async (e: React.SubmitEvent) => {
     e.preventDefault();
     setLoading(true);
-    setTimeout(() => (window.location.href = "/"), 1000);
+    try {
+      if (isLoginState) {
+        await login(email, password);
+      } else {
+        register(name, email, password);
+      }
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || error?.message);
+    } finally{
+      setLoading(false)
+    }
   };
   return (
     <div className="min-h-screen flex">
@@ -84,36 +103,46 @@ function Login() {
               </label>
             )}
             <label className="text-sm flex flex-col gap-1">
-                Email Address
-                <div className="relative">
-                  <MailIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-app-text-light" />
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    placeholder="your email"
-                    className="w-full pl-11 pr-4 py-3 text-sm bg-white rounded-xl border not-focus:border-app-border transition-all"
-                  />
-                </div>
-              </label>
-              <label className="text-sm flex flex-col gap-1">
-                Password
-                <div className="relative">
-                  <LockIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-app-text-light" />
-                  <input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    placeholder="......."
-                    className="w-full pl-11 pr-4 py-3 text-sm bg-white rounded-xl border not-focus:border-app-border transition-all"
-                  />
-                </div>
-              </label>
-              <button type="submit" disabled={loading} className="flex-center w-full py-3 bg-green-950 font-semibold text-white rounded-xl hover:bg-green-900 transition-colors disabled:opacity-50">
-                {loading ? <Loader2Icon className="animate-spin"/>:isLoginState ? "sing in" :"sign up"}
-              </button>
+              Email Address
+              <div className="relative">
+                <MailIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-app-text-light" />
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  placeholder="your email"
+                  className="w-full pl-11 pr-4 py-3 text-sm bg-white rounded-xl border not-focus:border-app-border transition-all"
+                />
+              </div>
+            </label>
+            <label className="text-sm flex flex-col gap-1">
+              Password
+              <div className="relative">
+                <LockIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-app-text-light" />
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  placeholder="......."
+                  className="w-full pl-11 pr-4 py-3 text-sm bg-white rounded-xl border not-focus:border-app-border transition-all"
+                />
+              </div>
+            </label>
+            <button
+              type="submit"
+              disabled={loading}
+              className="flex-center w-full py-3 bg-green-950 font-semibold text-white rounded-xl hover:bg-green-900 transition-colors disabled:opacity-50"
+            >
+              {loading ? (
+                <Loader2Icon className="animate-spin" />
+              ) : isLoginState ? (
+                "sing in"
+              ) : (
+                "sign up"
+              )}
+            </button>
           </form>
         </div>
       </div>
