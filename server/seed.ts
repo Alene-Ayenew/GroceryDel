@@ -398,7 +398,7 @@ const seedDB = async () => {
       },
     ];
     await prisma.product.createMany({ data: products });
-    console.log(`cleared ${products.length} products`);
+    console.log(`created ${products.length} products`);
 
     console.log("seed completed successfully");
   } catch (error) {
