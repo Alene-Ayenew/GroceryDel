@@ -2,9 +2,11 @@ import React, { useEffect, useState } from "react";
 import type { Order } from "../types";
 import { Link, useSearchParams } from "react-router-dom";
 import { useCart } from "../context/CartContext";
-import { dummyDashboardOrdersData, statusColors } from "../assets/assets";
+import { statusColors } from "../assets/assets";
 import Loading from "../components/Loading";
 import { CalendarIcon, ChevronLeftIcon, PackageIcon } from "lucide-react";
+import api from "../config/api";
+import toast from "react-hot-toast";
 
 function MyOrders() {
   const currency = import.meta.env.VITE_CURRENCY_SYMBOL || "$";
@@ -15,8 +17,16 @@ function MyOrders() {
   const tabs = ["all", "Placed", "out of Delivery", "Delivered"];
   const { clearCart } = useCart();
   const fetchOrders = async () => {
-    setOrders(dummyDashboardOrdersData as any);
-    setLoading(false);
+    setLoading(true);
+    try {
+      const params = activeTab !== "all" ? `status=${activeTab}` : "";
+      const { data } = await api.get(`/orders${params}`);
+      setOrders(data.orders);
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || error?.message);
+    } finally {
+      setLoading(false);
+    }
   };
   useEffect(() => {
     if (searchParams.get("clearCart")) {
@@ -66,38 +76,68 @@ function MyOrders() {
           </div>
         ) : (
           <div className="space-y-4">
-            {orders.map((order)=>(
-              <Link key={order.id} to={`/orders/${order.id}`} className="block
-               max-w-4xl bg-white rounded-2xl p-5 hover:shadow transition-all " >
+            {orders.map((order) => (
+              <Link
+                key={order.id}
+                to={`/orders/${order.id}`}
+                className="block
+               max-w-4xl bg-white rounded-2xl p-5 hover:shadow transition-all "
+              >
                 {/* order id, state , and status*/}
                 <div className="flex  items-start justify-between mb-3 ">
                   {/* left */}
                   <div>
-                    <p className="text-sm font-medium text-app-green">Order #{order.id.slice(-8).toUpperCase()}</p>
+                    <p className="text-sm font-medium text-app-green">
+                      Order #{order.id.slice(-8).toUpperCase()}
+                    </p>
                     <div className="flex items-center gap-2 mt-1">
-                      <CalendarIcon className="size-3 text-app-text-light"/>
-                      <span className="text-xs text-app-text-light">{new Date(order.createdAt).toLocaleDateString("en-US",{month:"short", day: "numeric", year: "numeric"})}</span>
+                      <CalendarIcon className="size-3 text-app-text-light" />
+                      <span className="text-xs text-app-text-light">
+                        {new Date(order.createdAt).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        })}
+                      </span>
                     </div>
                   </div>
                   {/* right */}
                   <div className="flex items-center gap-2 ">
-                    <span className={`px-4 py-1 text-xs font-medium rounded-full ${statusColors[order.status]  || "bg-gray-100 text-gray-700"}`}>{order.status} </span>
+                    <span
+                      className={`px-4 py-1 text-xs font-medium rounded-full ${statusColors[order.status] || "bg-gray-100 text-gray-700"}`}
+                    >
+                      {order.status}{" "}
+                    </span>
                     {/* <ChevronLeftIcon className="size-4 text-app-text-light"/> */}
                   </div>
                 </div>
                 {/* time thumbnails  */}
                 <div className="flex items-center gap-2 mb-3 ">
-                  {order.items.slice(0,4).map((item,i)=>(
-                    <img src={item.image} alt={item.name} className="size-12 sm:size-16 rounded-lg object-cover border border-app-border" />
+                  {order.items.slice(0, 4).map((item, i) => (
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      className="size-12 sm:size-16 rounded-lg object-cover border border-app-border"
+                    />
                   ))}
-                  {order.items.length > 4 && <div className="size-12 sm:size-16 rounded-lg bg-app-cream flex-center text-xs font-semibold text-app-text-light"> +{order.items.length - 4 }</div>}
+                  {order.items.length > 4 && (
+                    <div className="size-12 sm:size-16 rounded-lg bg-app-cream flex-center text-xs font-semibold text-app-text-light">
+                      {" "}
+                      +{order.items.length - 4}
+                    </div>
+                  )}
                 </div>
                 {/* total item and price */}
                 <div className="flex justify-between items-center pt-3 text-sm ">
-                  <span className="text-app-text-light">{order.items.length} items</span>
-                  <span className="font-semibold text-app-green">{currency}{order.total.toFixed(2)}</span>
+                  <span className="text-app-text-light">
+                    {order.items.length} items
+                  </span>
+                  <span className="font-semibold text-app-green">
+                    {currency}
+                    {order.total.toFixed(2)}
+                  </span>
                 </div>
-               </Link>
+              </Link>
             ))}
           </div>
         )}
